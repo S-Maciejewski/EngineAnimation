@@ -10,7 +10,7 @@ void error_callback(int error, const char* description) {
 
 //Procedura inicjuj¹ca
 void initOpenGLProgram() {
-	
+
 }
 
 //Procedura rysuj¹ca zawartoœæ sceny
