@@ -18,6 +18,8 @@ void drawScene(GLFWwindow* window) {
 	
 }
 
+//janek
+
 int main(void)
 {
 	GLFWwindow* window;						//WskaŸnik na obiekt reprezentuj¹cy okno
@@ -46,6 +48,7 @@ int main(void)
 	}
 
 	initOpenGLProgram(); //Operacje inicjuj¹ce
+	//komentarz testowy 
 
 	//G³ówna pêtla
 	while (!glfwWindowShouldClose(window))
