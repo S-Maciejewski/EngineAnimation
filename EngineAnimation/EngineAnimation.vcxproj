@@ -122,7 +122,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cube.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="allmodels.h" />
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="cube.h" />
+    <ClInclude Include="model.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
