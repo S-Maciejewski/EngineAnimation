@@ -15,7 +15,7 @@ void initOpenGLProgram() {
 
 //Procedura rysuj¹ca zawartoœæ sceny
 void drawScene(GLFWwindow* window) {
-	
+
 }
 
 //janek
