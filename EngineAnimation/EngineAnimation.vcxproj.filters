@@ -59,4 +59,8 @@
       <Filter>Pliki zasobów</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="EngineAnimation.aps" />
+    <None Include="glew32.dll" />
+  </ItemGroup>
 </Project>

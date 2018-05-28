@@ -140,6 +140,10 @@
   <ItemGroup>
     <ResourceCompile Include="EngineAnimation.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="EngineAnimation.aps" />
+    <None Include="glew32.dll" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
