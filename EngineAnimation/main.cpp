@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <cmath>
 #include "allmodels.h"
 #include "constants.h"
 
@@ -13,6 +14,11 @@ using namespace glm;
 
 float aspect = 1;
 float speed = PI/4;
+glm::vec3 cameraPosition;
+glm::vec3 cameraCenterPosition;
+float cameraRotateVerticalAngle;
+float cameraRotateHorizontalAngle;
+float cameraDistance;
 
 
 //Procedura obs³ugi b³êdów
@@ -26,20 +32,58 @@ void windowResize(GLFWwindow* window, int width, int height) {
 	aspect = (float)width / (float)height; //Compute aspect ratio of width to height of the window
 }
 
-//Procedure handling input events
-void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+void calculatePosition() {
+	cameraPosition.x = cos((cameraRotateVerticalAngle * 2 * PI) / 360) * cos((cameraRotateHorizontalAngle * 2 * PI) / 360) * cameraDistance;
+	cameraPosition.y = sin((cameraRotateVerticalAngle * 2 * PI) / 360) * cameraDistance;
+	cameraPosition.z = cos((cameraRotateVerticalAngle * 2 * PI) / 360) * sin((cameraRotateHorizontalAngle * 2 * PI) / 360) * cameraDistance;
 }
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraRotateVerticalAngle -= 1; calculatePosition();
+	} if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraRotateVerticalAngle += 1; calculatePosition();
+	}
+
+	if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraRotateHorizontalAngle += 1; calculatePosition();
+	} if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraRotateHorizontalAngle -= 1; calculatePosition();
+	}
+	
+	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraDistance += 10; calculatePosition();
+	} if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+		cameraDistance -= 10; calculatePosition();
+	}
+}
+
+
 
 //Procedura inicjuj¹ca
 void initOpenGLProgram(GLFWwindow* window) {
+
 	glfwSetFramebufferSizeCallback(window, windowResize);  //Zarejestruj procedurê zmieniaj¹c¹ rozmiar ramki
+	glfwSetErrorCallback(error_callback);	//Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetKeyCallback(window, key_callback);  
+
+	//glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
+
 	glClearColor(0, 0, 0, 1); //Ustaw kolor okna po wyczyszczeniu
 	glEnable(GL_LIGHTING); //W³¹cz model oœwietlenia
 	glEnable(GL_LIGHT0); //W³¹cz oœwietlenie 0
 	glEnable(GL_DEPTH_TEST); //W³¹cz depthbuffer
 	glEnable(GL_COLOR_MATERIAL); //W³¹cz obs³ugê materia³u
+
+	cameraDistance = -400.0f;
+	cameraPosition = { cameraDistance, 0.0f, 0.0f };
+	cameraCenterPosition = { 0.0f, 0.0f, 0.0f };
+	cameraRotateHorizontalAngle = 0;
+	cameraRotateVerticalAngle = 0;
 }
 
 //Procedura rysuj¹ca zawartoœæ sceny
@@ -47,10 +91,10 @@ void drawScene(GLFWwindow* window, float angle, float height) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyœæ buffer koloru i przygotuj do rysowania 
 
 														//***Prepare to draw****
-	mat4 P = perspective(50.0f*PI / 180.0f, aspect, 1.0f, 500.0f); //Compute projection matrix
+	mat4 P = perspective(50.0f*PI / 180.0f, aspect, 1.0f, 800.0f); //Compute projection matrix
 	mat4 V = lookAt( //Compute view matrix
-		vec3(0.0f, 0.0f, -400.0f),
-		vec3(0.0f, 0.0f, 0.0f),
+		cameraPosition,
+		cameraCenterPosition,
 		vec3(0.0f, 1.0f, 0.0f));
 	glMatrixMode(GL_PROJECTION); //Turn on projection matrix editing mode
 	glLoadMatrixf(value_ptr(P)); //Load projection matrix
@@ -88,8 +132,6 @@ int main(void)
 {
 	GLFWwindow* window;						//WskaŸnik na obiekt reprezentuj¹cy okno
 
-	glfwSetErrorCallback(error_callback);	//Zarejestruj procedurê obs³ugi b³êdów
-
 	if (!glfwInit()) {						//Zainicjuj bibliotekê GLFW
 		fprintf(stderr, "Nie mo¿na zainicjowaæ GLFW.\n");
 		exit(EXIT_FAILURE);
@@ -111,6 +153,8 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
+	
+
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 
 	float angle = 0;
@@ -122,7 +166,7 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 		//std::cout << "janek" << std::endl;
-		processInput(window);   //SprawdŸ input
+		//processInput(window);   //SprawdŸ input
 
 		angle += speed * glfwGetTime();
 		if(direction == 1) height += speed * glfwGetTime();
