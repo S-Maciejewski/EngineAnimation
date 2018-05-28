@@ -122,15 +122,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cube.cpp" />
+    <ClCompile Include="conrod.cpp" />
+    <ClCompile Include="crankshaft.cpp" />
+    <ClCompile Include="piston.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allmodels.h" />
+    <ClInclude Include="conrod.h" />
     <ClInclude Include="constants.h" />
-    <ClInclude Include="cube.h" />
+    <ClInclude Include="crankshaft.h" />
+    <ClInclude Include="piston.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EngineAnimation.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
