@@ -1,5 +1,1 @@
-﻿  main.cpp
-c:\users\jante\source\repos\engineanimation2\engineanimation\main.cpp(171): warning C4244: "+=": konwersja z "double" do "float", możliwa utrata danych
-c:\users\jante\source\repos\engineanimation2\engineanimation\main.cpp(172): warning C4244: "+=": konwersja z "double" do "float", możliwa utrata danych
-c:\users\jante\source\repos\engineanimation2\engineanimation\main.cpp(173): warning C4244: "-=": konwersja z "double" do "float", możliwa utrata danych
-  EngineAnimation.vcxproj -> C:\Users\jante\Source\Repos\EngineAnimation2\Debug\EngineAnimation.exe
+﻿  EngineAnimation.vcxproj -> C:\Users\jante\Source\Repos\EngineAnimation2\Debug\EngineAnimation.exe

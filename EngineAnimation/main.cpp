@@ -12,6 +12,7 @@
 
 using namespace glm;
 
+
 float aspect = 1;
 float speed = PI/4;
 glm::vec3 cameraPosition;
@@ -19,6 +20,7 @@ glm::vec3 cameraCenterPosition;
 float cameraRotateVerticalAngle;
 float cameraRotateHorizontalAngle;
 float cameraDistance;
+float rotateAngle;
 
 
 //Procedura obs³ugi b³êdów
@@ -32,10 +34,11 @@ void windowResize(GLFWwindow* window, int width, int height) {
 	aspect = (float)width / (float)height; //Compute aspect ratio of width to height of the window
 }
 
+//Procedura obliczaj¹ca wspó³rzêdne kamery na podstawie k¹tów obrotu w dwóch osiach i odleg³oœci kamery od œrodka uk³adu 
 void calculatePosition() {
-	cameraPosition.x = cos((cameraRotateVerticalAngle * 2 * PI) / 360) * cos((cameraRotateHorizontalAngle * 2 * PI) / 360) * cameraDistance;
-	cameraPosition.y = sin((cameraRotateVerticalAngle * 2 * PI) / 360) * cameraDistance;
-	cameraPosition.z = cos((cameraRotateVerticalAngle * 2 * PI) / 360) * sin((cameraRotateHorizontalAngle * 2 * PI) / 360) * cameraDistance;
+	cameraPosition.x = cos((cameraRotateVerticalAngle * PI) / 180.0f) * sin((cameraRotateHorizontalAngle * PI) / 180.0f) * cameraDistance;
+	cameraPosition.y = sin((cameraRotateVerticalAngle * PI) / 180.0f) * cameraDistance;
+	cameraPosition.z = cos((cameraRotateVerticalAngle * PI) / 180.0f) * cos((cameraRotateHorizontalAngle * PI) / 180.0f) * cameraDistance;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -43,23 +46,29 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraRotateVerticalAngle -= 1; calculatePosition();
-	} if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraRotateVerticalAngle += 1; calculatePosition();
-	}
+	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraRotateVerticalAngle -= 1;
+	if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraRotateVerticalAngle += 1;
 
-	if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraRotateHorizontalAngle += 1; calculatePosition();
-	} if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraRotateHorizontalAngle -= 1; calculatePosition();
-	}
+	if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraRotateHorizontalAngle += 1;
+	if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraRotateHorizontalAngle -= 1;
 	
-	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraDistance += 10; calculatePosition();
-	} if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-		cameraDistance -= 10; calculatePosition();
-	}
+	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraDistance += 10;
+	if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraDistance -= 10;
+
+	if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		rotateAngle += PI / 4.0f;
+	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		rotateAngle += PI / 4.0f;
+
+	printf("%f\n", rotateAngle);
+
+	calculatePosition();
 }
 
 
@@ -80,22 +89,19 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glEnable(GL_COLOR_MATERIAL); //W³¹cz obs³ugê materia³u
 
 	cameraDistance = -400.0f;
-	cameraPosition = { cameraDistance, 0.0f, 0.0f };
+	cameraPosition = { 0.0f, 0.0f, -400.0f };
 	cameraCenterPosition = { 0.0f, 0.0f, 0.0f };
 	cameraRotateHorizontalAngle = 0;
 	cameraRotateVerticalAngle = 0;
 }
 
 //Procedura rysuj¹ca zawartoœæ sceny
-void drawScene(GLFWwindow* window, float angle, float height) {
+void drawScene(GLFWwindow* window) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyœæ buffer koloru i przygotuj do rysowania 
 
 														//***Prepare to draw****
-	mat4 P = perspective(50.0f*PI / 180.0f, aspect, 1.0f, 800.0f); //Compute projection matrix
-	mat4 V = lookAt( //Compute view matrix
-		cameraPosition,
-		cameraCenterPosition,
-		vec3(0.0f, 1.0f, 0.0f));
+	mat4 P = perspective(50.0f*PI/180.0f, aspect, 1.0f, 800.0f); //Compute projection matrix
+	mat4 V = lookAt(cameraPosition, cameraCenterPosition, vec3(0.0f, 1.0f, 0.0f)); //Compute view matrix
 	glMatrixMode(GL_PROJECTION); //Turn on projection matrix editing mode
 	glLoadMatrixf(value_ptr(P)); //Load projection matrix
 	glMatrixMode(GL_MODELVIEW);  //Turn on modelview matrix editing mode
@@ -103,7 +109,7 @@ void drawScene(GLFWwindow* window, float angle, float height) {
 	mat4 M = mat4(1.0f);
 	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
 	M = translate(M, vec3(0.0f, 90.0f, 0.0f));
-	M = rotate(M, angle, vec3(0.0f, 1.0f, 0.0f));
+	M = rotate(M, rotateAngle, vec3(0.0f, 1.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(1.0f, 1.0f, 0.0f); //Set the objects color
 	Models::piston.drawSolid(); //Draw the model
@@ -111,7 +117,7 @@ void drawScene(GLFWwindow* window, float angle, float height) {
 	M = mat4(1.0f);
 	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
 	M = translate(M, vec3(0.0f, -90.0f, 0.0f));
-	M = rotate(M, angle, vec3(0.0f, 1.0f, 0.0f));
+	M = rotate(M, rotateAngle, vec3(0.0f, 1.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 1.0f); //Set the objects color
 	Models::conrod.drawSolid(); //Draw the model
@@ -119,7 +125,7 @@ void drawScene(GLFWwindow* window, float angle, float height) {
 	M = mat4(1.0f);
 	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
 	M = translate(M, vec3(0.0f, 5.0f, 0.0f));
-	M = rotate(M, angle, vec3(1.0f, 0.0f, 0.0f));
+	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(1.0f, 0.0f, 1.0f); //Set the objects color
 	Models::crankshaft.drawSolid(); //Draw the model
@@ -157,7 +163,7 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 
-	float angle = 0;
+	rotateAngle = 0;
 	float height = 0;
 	int direction = 1;
 	glfwSetTime(0);
@@ -165,19 +171,11 @@ int main(void)
 	//G³ówna pêtla
 	while (!glfwWindowShouldClose(window))
 	{
-		//std::cout << "janek" << std::endl;
-		//processInput(window);   //SprawdŸ input
-
-		angle += speed * glfwGetTime();
-		if(direction == 1) height += speed * glfwGetTime();
-		else height -= speed * glfwGetTime();
-
-		if (height > 1) direction = -1;
-		if (height < -1) direction = 1;
-		
+		//rotateAngle += speed * glfwGetTime();
+		//printf("%f\n", rotateAngle);
 		glfwSetTime(0);
 
-		drawScene(window, angle, height);	//Wykonaj procedurê rysuj¹c¹
+		drawScene(window);	//Wykonaj procedurê rysuj¹c¹
 		glfwPollEvents();	//Wykonaj procedury callback w zaleznoœci od zdarzeñ jakie zasz³y.
 	}
 
