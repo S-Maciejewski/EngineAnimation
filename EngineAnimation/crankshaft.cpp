@@ -17,7 +17,7 @@ namespace Models {
 		int counter = 0;
 
 		FILE * file;
-		fopen_s(&file, "Objects/untitled.obj", "r");
+		fopen_s(&file, "Objects/crankshaft.obj", "r");
 		if (file == NULL) {
 			printf("Impossible to open the file !\n");
 		}
@@ -83,9 +83,9 @@ namespace Models {
 			glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 			glm::vec3 normal = temp_normals[normalIndex - 1];
 
-			vertex.x = vertex.x - minx - srx;
-			vertex.y = vertex.y - miny - sry;
-			vertex.z = vertex.z - minz - srz;
+			//vertex.x = vertex.x - minx - srx;
+			//vertex.y = vertex.y - miny - sry;
+			//vertex.z = vertex.z - minz - srz;
 
 			vertex.x *= 0.5;
 			vertex.y *= 0.5;
