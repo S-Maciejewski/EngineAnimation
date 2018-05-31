@@ -62,13 +62,4 @@
   <ItemGroup>
     <None Include="glew32.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="Objects\conrod.obj" />
-    <Object Include="Objects\conrod2.obj" />
-    <Object Include="Objects\crankshaft.obj" />
-    <Object Include="Objects\cube.obj" />
-    <Object Include="Objects\crankshaft2.obj" />
-    <Object Include="Objects\piston.obj" />
-    <Object Include="Objects\valve.obj" />
-  </ItemGroup>
 </Project>

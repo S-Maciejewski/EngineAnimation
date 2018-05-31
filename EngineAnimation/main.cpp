@@ -56,9 +56,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		cameraRotateVerticalAngle += 5;
 
 	if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		cameraRotateHorizontalAngle += 5;
-	if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraRotateHorizontalAngle -= 5;
+	if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		cameraRotateHorizontalAngle += 5;
 	
 	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraDistance += 10;
