@@ -20,7 +20,11 @@ glm::vec3 cameraCenterPosition;
 float cameraRotateVerticalAngle;
 float cameraRotateHorizontalAngle;
 float cameraDistance;
-float rotateAngle;
+
+float rotateAngle;	//K¹t obrotu wa³u
+float r;			//Promieñ wa³u (pó³ jednego suwu)
+float l;			//D³ugoœæ korbowodu
+float x;			//Pozycja t³oka (wysokoœæ od œrodka wa³u)
 
 
 //Procedura obs³ugi b³êdów
@@ -47,14 +51,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 
 	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		cameraRotateVerticalAngle -= 1;
+		cameraRotateVerticalAngle -= 5;
 	if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		cameraRotateVerticalAngle += 1;
+		cameraRotateVerticalAngle += 5;
 
 	if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		cameraRotateHorizontalAngle += 1;
+		cameraRotateHorizontalAngle += 5;
 	if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		cameraRotateHorizontalAngle -= 1;
+		cameraRotateHorizontalAngle -= 5;
 	
 	if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraDistance += 10;
@@ -62,16 +66,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		cameraDistance -= 10;
 
 	if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		rotateAngle += PI / 4.0f;
+		rotateAngle += PI / 8.0f;
 	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
-		rotateAngle += PI / 4.0f;
+		rotateAngle -= PI / 8.0f;
 
-	printf("%f\n", rotateAngle);
+	printf("%f\n", rotateAngle);	//¯eby ³atwiej by³o zrobiæ prawid³owy timing zaworów 
+	if (rotateAngle >= 2*3.1415f) {
+		rotateAngle -= 2*3.1415f;
+	}
 
 	calculatePosition();
 }
-
-
 
 //Procedura inicjuj¹ca
 void initOpenGLProgram(GLFWwindow* window) {
@@ -99,7 +104,6 @@ void initOpenGLProgram(GLFWwindow* window) {
 void drawScene(GLFWwindow* window) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyœæ buffer koloru i przygotuj do rysowania 
 
-														//***Prepare to draw****
 	mat4 P = perspective(50.0f*PI/180.0f, aspect, 1.0f, 800.0f); //Compute projection matrix
 	mat4 V = lookAt(cameraPosition, cameraCenterPosition, vec3(0.0f, 1.0f, 0.0f)); //Compute view matrix
 	glMatrixMode(GL_PROJECTION); //Turn on projection matrix editing mode
@@ -107,28 +111,28 @@ void drawScene(GLFWwindow* window) {
 	glMatrixMode(GL_MODELVIEW);  //Turn on modelview matrix editing mode
 
 	mat4 M = mat4(1.0f);
-	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
-	M = translate(M, vec3(0.0f, 90.0f, 0.0f));
-	M = rotate(M, rotateAngle, vec3(0.0f, 1.0f, 0.0f));
+	x = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
+	M = translate(M, vec3(0.0f, 120.0f, 0.0f));	//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, x, 0.0f));		//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 1.0f, 0.0f); //Set the objects color
-	Models::piston.drawSolid(); //Draw the model
+	glColor3d(1.0f, 1.0f, 0.0f); 
+	Models::piston.drawSolid(); 
 
 	M = mat4(1.0f);
-	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
-	M = translate(M, vec3(0.0f, -90.0f, 0.0f));
-	M = rotate(M, rotateAngle, vec3(0.0f, 1.0f, 0.0f));
+
+	M = translate(M, vec3(0.0f, 60.0f, 0.0f));	//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, 0.0f, 0.0f));	//Ruch korbowodu TODO
+	//M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 1.0f); //Set the objects color
-	Models::conrod.drawSolid(); //Draw the model
+	glColor3d(0.0f, 1.0f, 1.0f); 
+	Models::conrod.drawSolid(); 
 
 	M = mat4(1.0f);
-	//M = rotate(M, 45*PI/180, vec3(0.0f, 1.0f, 0.0f));
-	M = translate(M, vec3(0.0f, 5.0f, 0.0f));
+	M = translate(M, vec3(0.0f, 0.0f, 0.0f));
 	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 0.0f, 1.0f); //Set the objects color
-	Models::crankshaft.drawSolid(); //Draw the model
+	glColor3d(1.0f, 0.0f, 1.0f); 
+	Models::crankshaft.drawSolid(); 
 
 
 	glfwSwapBuffers(window); //Swap the back and front buffers
@@ -159,9 +163,11 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	
-
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
+
+	//Orientacyjne wartoœci - do zmierzenia
+	r = 40.0f;
+	l = 60.0f;
 
 	rotateAngle = 0;
 	float height = 0;
@@ -171,8 +177,6 @@ int main(void)
 	//G³ówna pêtla
 	while (!glfwWindowShouldClose(window))
 	{
-		//rotateAngle += speed * glfwGetTime();
-		//printf("%f\n", rotateAngle);
 		glfwSetTime(0);
 
 		drawScene(window);	//Wykonaj procedurê rysuj¹c¹
