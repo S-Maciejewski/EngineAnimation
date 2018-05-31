@@ -17,7 +17,7 @@ namespace Models {
 		int counter = 0;
 
 		FILE * file;
-		fopen_s(&file, "Objects/conrod.obj", "r");
+		fopen_s(&file, "Objects/conrod2.obj", "r");
 		if (file == NULL) {
 			printf("Impossible to open the file !\n");
 		}

@@ -17,7 +17,7 @@ namespace Models {
 		int counter = 0;
 
 		FILE * file;
-		fopen_s(&file, "Objects/crankshaft.obj", "r");
+		fopen_s(&file, "Objects/crankshaft2.obj", "r");
 		if (file == NULL) {
 			printf("Impossible to open the file !\n");
 		}
@@ -57,9 +57,9 @@ namespace Models {
 			}
 		}
 
-		float minx = 2000, miny = 2000, minz = 2000, maxx = -2000, maxy = -2000, maxz = -2000, srx, sry, srz;
+		//float minx = 2000, miny = 2000, minz = 2000, maxx = -2000, maxy = -2000, maxz = -2000, srx, sry, srz;
 
-		for (int i = 0; i < counter * 3; i++) {
+		/*for (int i = 0; i < counter * 3; i++) {
 			unsigned int vertexIndex = vertexIndices[i];
 			unsigned int normalIndex = normalIndices[i];
 			glm::vec3 vertex = temp_vertices[vertexIndex - 1];
@@ -74,7 +74,7 @@ namespace Models {
 		}
 		srx = (maxx - minx) / 2.0f;
 		sry = (maxy - miny) / 2.0f;
-		srz = (maxz - minz) / 2.0f;
+		srz = (maxz - minz) / 2.0f;*/
 
 
 		for (int i = 0; i < counter * 3; i++) {
@@ -87,9 +87,9 @@ namespace Models {
 			//vertex.y = vertex.y - miny - sry;
 			//vertex.z = vertex.z - minz - srz;
 
-			vertex.x *= 0.5;
+			/*vertex.x *= 0.5;
 			vertex.y *= 0.5;
-			vertex.z *= 0.5;
+			vertex.z *= 0.5;*/
 
 			vertices.push_back(vertex);
 			normals.push_back(normal);
