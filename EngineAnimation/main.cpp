@@ -120,9 +120,9 @@ void drawScene(GLFWwindow* window) {
 
 	M = mat4(1.0f);
 
-	M = translate(M, vec3(0.0f, 60.0f, 0.0f));	//Pozycja pocz¹tkowa
-	M = translate(M, vec3(0.0f, 0.0f, 0.0f));	//Ruch korbowodu TODO
-	//M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
+	//M = translate(M, vec3(0.0f, 60.0f, 0.0f));	//Pozycja pocz¹tkowa
+	//M = translate(M, vec3(0.0f, 0.0f, 0.0f));	//Ruch korbowodu TODO
+	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 1.0f); 
 	Models::conrod.drawSolid(); 

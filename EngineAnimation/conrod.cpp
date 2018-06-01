@@ -57,35 +57,11 @@ namespace Models {
 			}
 		}
 
-		float minx = 2000, miny = 2000, minz = 2000, maxx = -2000, maxy = -2000, maxz = -2000, srx, sry, srz;
-
 		for (int i = 0; i < counter * 3; i++) {
 			unsigned int vertexIndex = vertexIndices[i];
 			unsigned int normalIndex = normalIndices[i];
 			glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 			glm::vec3 normal = temp_normals[normalIndex - 1];
-
-			if (vertex.x > maxx) maxx = vertex.x;
-			if (vertex.y > maxy) maxy = vertex.y;
-			if (vertex.z > maxz) maxz = vertex.z;
-			if (vertex.x < minx) minx = vertex.x;
-			if (vertex.y < miny) miny = vertex.y;
-			if (vertex.z < minz) minz = vertex.z;
-		}
-		srx = (maxx - minx) / 2.0f;
-		sry = (maxy - miny) / 2.0f;
-		srz = (maxz - minz) / 2.0f;
-
-
-		for (int i = 0; i < counter * 3; i++) {
-			unsigned int vertexIndex = vertexIndices[i];
-			unsigned int normalIndex = normalIndices[i];
-			glm::vec3 vertex = temp_vertices[vertexIndex - 1];
-			glm::vec3 normal = temp_normals[normalIndex - 1];
-
-			vertex.x = vertex.x - minx - srx;
-			vertex.y = vertex.y - miny - sry;
-			vertex.z = vertex.z - minz - srz;
 
 			normal.x = -normal.x;
 			normal.y = -normal.y;
