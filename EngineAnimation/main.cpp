@@ -25,7 +25,8 @@ float rotateAngle;	//K¹t obrotu wa³u
 float r;			//Promieñ wa³u (pó³ jednego suwu)
 float l;			//D³ugoœæ korbowodu
 float x;			//Pozycja t³oka (wysokoœæ od œrodka wa³u)
-
+float y;			//Offset panweki w y
+float z;			//Offset panewki w z
 
 //Procedura obs³ugi b³êdów
 void error_callback(int error, const char* description) {
@@ -111,20 +112,25 @@ void drawScene(GLFWwindow* window) {
 	glLoadMatrixf(value_ptr(P)); //Load projection matrix
 	glMatrixMode(GL_MODELVIEW);  //Turn on modelview matrix editing mode
 
-	mat4 M = mat4(1.0f);
+	//Obliczenia kinematyczne
 	x = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
-	M = translate(M, vec3(0.0f, 45.0f, 3.0f));										//Pozycja pocz¹tkowa
-	M = translate(M, vec3(0.0f, x, 0.0f));											//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
+	//if(rotateAngle<=)
+	y = -(sqrt(r)*sqrt(tan(PI / 4.0f - rotateAngle)) / sqrt(tan(rotateAngle) + tan(PI / 4.0f - rotateAngle)));
+	z = -(sqrt(r) / (sqrt(tan(PI / 4.0f - rotateAngle))*sqrt(tan(rotateAngle) + tan(PI / 4.0f - rotateAngle))));
+
+	mat4 M = mat4(1.0f);
+	M = translate(M, vec3(0.0f, 45.0f, 3.0f));									//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, x, 0.0f));										//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(1.0f, 1.0f, 0.0f); 
 	Models::piston.drawSolid(); 
 
 	M = mat4(1.0f);
-
-	M = translate(M, vec3(3.0f, 20.0f, 3.0f));	//Pozycja pocz¹tkowa
-	//M = translate(M, vec3(0.0f, 0.0f, 0.0f));	//Ruch korbowodu TODO
+	 
+	M = translate(M, vec3(3.0f, 20.0f, 2.0f));	//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, -y, -z));	//Ruch korbowodu
 	M = rotate(M, PI, vec3(1.0f, 0.0f, 0.0f));
-	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
+	//M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 1.0f); 
 	Models::conrod.drawSolid(); 
