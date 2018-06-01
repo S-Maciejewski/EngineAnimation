@@ -93,8 +93,8 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glEnable(GL_DEPTH_TEST); //W³¹cz depthbuffer
 	glEnable(GL_COLOR_MATERIAL); //W³¹cz obs³ugê materia³u
 
-	cameraDistance = -500.0f;
-	cameraPosition = { 0.0f, 0.0f, cameraDistance };
+	cameraDistance = -400.0f;
+	cameraPosition = { 0.0f, 0.0f, -400.0f };
 	cameraCenterPosition = { 0.0f, 0.0f, 0.0f };
 	cameraRotateHorizontalAngle = 0;
 	cameraRotateVerticalAngle = 0;
@@ -120,11 +120,9 @@ void drawScene(GLFWwindow* window) {
 
 	M = mat4(1.0f);
 
-	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
-	M = translate(M, vec3(1.0f, 55.0f, 8.0f));			//Pozycja pocz¹tkowa
-	M = translate(M, vec3(0.0f, 0.0f, 0.0f));			//Ruch korbowodu TODO
-	M = rotate(M, PI, vec3(1.0f, 0.0f, 0.0f));
-	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
+	M = translate(M, vec3(0.0f, 60.0f, 0.0f));	//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, 0.0f, 0.0f));	//Ruch korbowodu TODO
+	//M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));	//Rotacja korbowodu TODO
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 1.0f); 
 	Models::conrod.drawSolid(); 
