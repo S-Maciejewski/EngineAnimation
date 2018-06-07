@@ -21,14 +21,15 @@ float cameraRotateVerticalAngle;
 float cameraRotateHorizontalAngle;
 float cameraDistance;
 
-float rotateAngle;	//K¹t obrotu wa³u
-float r;			//Promieñ wa³u (pó³ jednego suwu)
-float l;			//D³ugoœæ korbowodu
-float x;			//Pozycja t³oka (wysokoœæ od œrodka wa³u)
-float y;			//Offset panweki w y
-float z;			//Offset panewki w z
-float rodAngle;		//K¹t odchylenia korbowodu
-bool idle, rev;			//Automatyczny obrót silnika
+float rotateAngle;							//K¹t obrotu wa³u
+float r;									//Promieñ wa³u (pó³ jednego suwu)
+float l;									//D³ugoœæ korbowodu
+float xpos0, xpos1, xpos2;					//Pozycja t³oka (wysokoœæ od œrodka wa³u)
+float yoff0, yoff1, yoff2;					//Offset panweki w y
+float zoff0, zoff1, zoff2;					//Offset panewki w z
+float rodAngle0, rodAngle1, rodAngle2;		//K¹t odchylenia korbowodu
+bool idle, rev;								//Automatyczny obrót silnika
+float offset0 = 17.0f / 32.0f * PI, offset2 = -15.0f / 32.0f * PI;
 
 //Procedura obs³ugi b³êdów
 void error_callback(int error, const char* description) {
@@ -78,7 +79,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		rotateAngle -= PI / 32.0f;
 
-	printf("%d/32 PI\n", int(rotateAngle/PI*32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing zaworów 
+	printf("%d/32 PI\n", int(rotateAngle/PI*32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing
 	if (rotateAngle >= PI)
 		rotateAngle = -PI;
 	else if (rotateAngle <= -PI)
@@ -130,27 +131,74 @@ void drawScene(GLFWwindow* window) {
 		rotateAngle = PI;
 
 	//Obliczenia kinematyczne
-	x = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
-	y = r * cos(rotateAngle);	//Wyliczanie pozycji korbowodu
-	z = r * sin(rotateAngle);	//Wyliczanie pozycji korbowodu
-	rodAngle = acos(z / l);		//Wyliczanie k¹ta odchylenia korbowodu
+	xpos0 = r * cos(rotateAngle - offset0) + sqrt(l*l - (r*r*sin(rotateAngle - offset0)*sin(rotateAngle - offset0)));
+	yoff0 = r * cos(rotateAngle - offset0);
+	zoff0 = r * sin(rotateAngle - offset0);
+	rodAngle0 = acos(zoff0 / l);
+	xpos1 = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
+	yoff1 = r * cos(rotateAngle);	//Wyliczanie pozycji korbowodu
+	zoff1 = r * sin(rotateAngle);	//Wyliczanie pozycji korbowodu
+	rodAngle1 = acos(zoff1 / l);	//Wyliczanie k¹ta odchylenia korbowodu
+	xpos2 = r * cos(rotateAngle - offset2) + sqrt(l*l - (r*r*sin(rotateAngle - offset2)*sin(rotateAngle - offset2)));
+	yoff2 = r * cos(rotateAngle - offset2);
+	zoff2 = r * sin(rotateAngle - offset2);
+	rodAngle2 = acos(zoff2 / l);
 
+
+	//T³ok 0.
 	mat4 M = mat4(1.0f);
+	M = translate(M, vec3(92.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, xpos0, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(1.0f, 1.0f, 0.0f);
+	Models::piston.drawSolid();
+
+	//T³ok 1.
+	M = mat4(1.0f);
 	M = translate(M, vec3(3.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
-	M = translate(M, vec3(0.0f, x, 0.0f));				//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
+	M = translate(M, vec3(0.0f, xpos1, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(1.0f, 1.0f, 0.0f); 
 	Models::piston.drawSolid(); 
 
+	//T³ok 2.
 	M = mat4(1.0f);
-	 
-	M = translate(M, vec3(3.0f, 2.0f, 2.0f));							//Pozycja pocz¹tkowa
-	M = translate(M, vec3(0.0f, y, z));									//Ruch korbowodu
+	M = translate(M, vec3(-88.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, xpos2, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(1.0f, 1.0f, 0.0f);
+	Models::piston.drawSolid();
+
+
+	//Korobowód 0.
+	M = mat4(1.0f);
+	M = translate(M, vec3(92.0f, 2.0f, 2.0f));							//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, yoff0, zoff0));							//Ruch korbowodu
 	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
-	M = rotate(M, rodAngle, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
+	M = rotate(M, rodAngle0, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(0.0f, 1.0f, 1.0f);
+	Models::conrod.drawSolid();
+
+	//Korobowód 1.
+	M = mat4(1.0f); 
+	M = translate(M, vec3(3.0f, 2.0f, 2.0f));							//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, yoff1, zoff1));							//Ruch korbowodu
+	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
+	M = rotate(M, rodAngle1, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 1.0f); 
 	Models::conrod.drawSolid(); 
+
+	//Korobowód 2.
+	M = mat4(1.0f);
+	M = translate(M, vec3(-88.0f, 2.0f, 2.0f));							//Pozycja pocz¹tkowa
+	M = translate(M, vec3(0.0f, yoff2, zoff2));							//Ruch korbowodu
+	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
+	M = rotate(M, rodAngle2, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(0.0f, 1.0f, 1.0f);
+	Models::conrod.drawSolid();
 
 	M = mat4(1.0f);
 	M = rotate(M, -(6.0f / 32.0f)*PI, vec3(1.0f, 0.0f, 0.0f));	//Ustawienie pozycji pocz¹tkowej wa³u w celu synchronizacji 
