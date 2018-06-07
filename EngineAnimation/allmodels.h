@@ -19,5 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "piston.h"
 #include "conrod.h"
 #include "crankshaft.h"
+#include "valve.h"
 
 #endif

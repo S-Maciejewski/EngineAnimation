@@ -35,6 +35,12 @@ float rodAngle0, rodAngle1, rodAngle2;		//K¹t odchylenia korbowodu
 bool idle, rev;								//Automatyczny obrót silnika
 float offset0 = 17.0f / 32.0f * PI, offset2 = -15.0f / 32.0f * PI;
 
+void calculateStroke() {
+	if (rotateAngle >= 2 * PI)
+		rotateAngle = 0;
+
+}
+
 //Procedura obs³ugi b³êdów
 void error_callback(int error, const char* description) {
 	fputs(description, stderr);
@@ -84,10 +90,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		rotateAngle -= PI / 32.0f;
 
 	printf("%d/32 PI\n", int(rotateAngle/PI*32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing
-	if (rotateAngle >= PI)
-		rotateAngle = -PI;
-	else if (rotateAngle <= -PI)
-		rotateAngle = PI;
+	
+	calculateStroke();
 
 	calculatePosition();
 }
@@ -129,10 +133,7 @@ void drawScene(GLFWwindow* window) {
 	if (rev)
 		rotateAngle += PI / 8.0f;
 
-	if (rotateAngle >= PI)
-		rotateAngle = -PI;
-	else if (rotateAngle <= -PI)
-		rotateAngle = PI;
+	calculateStroke();
 
 	//Obliczenia kinematyczne
 	xpos0 = r * cos(rotateAngle - offset0) + sqrt(l*l - (r*r*sin(rotateAngle - offset0)*sin(rotateAngle - offset0)));
@@ -173,6 +174,13 @@ void drawScene(GLFWwindow* window) {
 	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid();
 
+	//Zawory
+	M = mat4(1.0f);
+	//M = scale(M, vec3(10.0f, 20.0f, 10.0f));
+	M = translate(M, vec3(0.0f, 140.0f, 0.0f));
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(0.0f, 1.0f, 0.0f);
+	Models::valve.drawSolid();
 
 	//Korobowód 0.
 	M = mat4(1.0f);
