@@ -32,13 +32,35 @@ float xpos0, xpos1, xpos2;					//Pozycja t³oka (wysokoœæ od œrodka wa³u)
 float yoff0, yoff1, yoff2;					//Offset panweki w y
 float zoff0, zoff1, zoff2;					//Offset panewki w z
 float rodAngle0, rodAngle1, rodAngle2;		//K¹t odchylenia korbowodu
-bool idle, rev;								//Automatyczny obrót silnika
 float offset0 = 17.0f / 32.0f * PI, offset2 = -15.0f / 32.0f * PI;
+bool idle, rev;								//Automatyczny obrót silnika
+float acc, throttle;
 
 void calculateStroke() {
-	if (rotateAngle >= 2 * PI)
+	if (rotateAngle >= 4 * PI)
 		rotateAngle = 0;
 
+}
+
+void engineResponse() {
+	if (idle)
+		rotateAngle += PI / 32.0f;
+	if (rev)
+		rotateAngle += PI / 8.0f;
+	if (idle) {
+		if (throttle > 0.2f) {
+			throttle -= 0.2f;
+			if (acc >= 0) {
+				acc = sqrt(throttle);
+			}
+			else
+				acc = 0;
+		}
+		else
+			throttle = 0;
+		rotateAngle += PI / 32.0f * acc;
+	}
+	
 }
 
 //Procedura obs³ugi b³êdów
@@ -68,6 +90,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		idle = !idle;
 	if (key == GLFW_KEY_R && action == GLFW_PRESS)
 		rev = !rev;
+
+	if (key == GLFW_KEY_G && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		if (throttle <= 25.0f) 
+			throttle += 0.5f;
 
 	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraRotateVerticalAngle -= 5;
@@ -99,17 +125,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 //Procedura inicjuj¹ca
 void initOpenGLProgram(GLFWwindow* window) {
 
-	glfwSetFramebufferSizeCallback(window, windowResize);  //Zarejestruj procedurê zmieniaj¹c¹ rozmiar ramki
-	glfwSetErrorCallback(error_callback);	//Zarejestruj procedurê obs³ugi b³êdów
+	glfwSetFramebufferSizeCallback(window, windowResize);	//Zarejestruj procedurê zmieniaj¹c¹ rozmiar ramki
+	glfwSetErrorCallback(error_callback);					//Zarejestruj procedurê obs³ugi b³êdów
 	glfwSetKeyCallback(window, key_callback);  
 
 	//glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 
-	glClearColor(0, 0, 0, 1); //Ustaw kolor okna po wyczyszczeniu
-	glEnable(GL_LIGHTING); //W³¹cz model oœwietlenia
-	glEnable(GL_LIGHT0); //W³¹cz oœwietlenie 0
-	glEnable(GL_DEPTH_TEST); //W³¹cz depthbuffer
-	glEnable(GL_COLOR_MATERIAL); //W³¹cz obs³ugê materia³u
+	glClearColor(0, 0, 0, 1);	//Ustaw kolor okna po wyczyszczeniu
+	glEnable(GL_LIGHTING);		//W³¹cz model oœwietlenia
+	glEnable(GL_LIGHT0);		//W³¹cz oœwietlenie 0
+	glEnable(GL_DEPTH_TEST);	//W³¹cz depthbuffer
+	glEnable(GL_COLOR_MATERIAL);//W³¹cz obs³ugê materia³u
 
 	cameraDistance = -400.0f;
 	cameraPosition = { 0.0f, 0.0f, -400.0f };
@@ -122,16 +148,13 @@ void initOpenGLProgram(GLFWwindow* window) {
 void drawScene(GLFWwindow* window) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyœæ buffer koloru i przygotuj do rysowania 
 
-	mat4 P = perspective(50.0f*PI/180.0f, aspect, 1.0f, 800.0f); //Compute projection matrix
-	mat4 V = lookAt(cameraPosition, cameraCenterPosition, vec3(0.0f, 1.0f, 0.0f)); //Compute view matrix
+	mat4 P = perspective(50.0f*PI/180.0f, aspect, 1.0f, 800.0f);					//Compute projection matrix
+	mat4 V = lookAt(cameraPosition, cameraCenterPosition, vec3(0.0f, 1.0f, 0.0f));	//Compute view matrix
 	glMatrixMode(GL_PROJECTION); //Turn on projection matrix editing mode
 	glLoadMatrixf(value_ptr(P)); //Load projection matrix
 	glMatrixMode(GL_MODELVIEW);  //Turn on modelview matrix editing mode
 
-	if (idle)
-		rotateAngle += PI / 32.0f;
-	if (rev)
-		rotateAngle += PI / 8.0f;
+
 
 	calculateStroke();
 
@@ -174,13 +197,13 @@ void drawScene(GLFWwindow* window) {
 	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid();
 
-	//Zawory
+	//Zawory TODO
 	M = mat4(1.0f);
 	//M = scale(M, vec3(10.0f, 20.0f, 10.0f));
 	M = translate(M, vec3(0.0f, 140.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 0.0f);
-	Models::valve.drawSolid();
+	//Models::valve.drawSolid();
 
 	//Korobowód 0.
 	M = mat4(1.0f);
@@ -254,6 +277,8 @@ int main(void)
 	l = 80.0f;
 
 	idle = false;
+	throttle = 0;
+	acc = 0;
 	rotateAngle = 0;
 	float height = 0;
 	int direction = 1;
@@ -263,6 +288,8 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwSetTime(0);
+
+		engineResponse();
 
 		drawScene(window);	//Wykonaj procedurê rysuj¹c¹
 		glfwPollEvents();	//Wykonaj procedury callback w zaleznoœci od zdarzeñ jakie zasz³y.
