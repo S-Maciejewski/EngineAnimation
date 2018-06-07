@@ -28,7 +28,7 @@ float x;			//Pozycja t³oka (wysokoœæ od œrodka wa³u)
 float y;			//Offset panweki w y
 float z;			//Offset panewki w z
 float rodAngle;		//K¹t odchylenia korbowodu
-bool idle;			//Automatyczny obrót silnika
+bool idle, rev;			//Automatyczny obrót silnika
 
 //Procedura obs³ugi b³êdów
 void error_callback(int error, const char* description) {
@@ -53,8 +53,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
 		idle = !idle;
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+		rev = !rev;
 
 	if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraRotateVerticalAngle -= 5;
@@ -76,7 +78,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		rotateAngle -= PI / 32.0f;
 
-	printf("%f\n", rotateAngle);	//¯eby ³atwiej by³o zrobiæ prawid³owy timing zaworów 
+	printf("%d/32 PI\n", int(rotateAngle/PI*32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing zaworów 
 	if (rotateAngle >= PI)
 		rotateAngle = -PI;
 	else if (rotateAngle <= -PI)
@@ -119,6 +121,8 @@ void drawScene(GLFWwindow* window) {
 
 	if (idle)
 		rotateAngle += PI / 32.0f;
+	if (rev)
+		rotateAngle += PI / 8.0f;
 
 	if (rotateAngle >= PI)
 		rotateAngle = -PI;
@@ -132,7 +136,7 @@ void drawScene(GLFWwindow* window) {
 	rodAngle = acos(z / l);		//Wyliczanie k¹ta odchylenia korbowodu
 
 	mat4 M = mat4(1.0f);
-	M = translate(M, vec3(0.0f, 37.0f, 3.0f));			//Pozycja pocz¹tkowa
+	M = translate(M, vec3(3.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
 	M = translate(M, vec3(0.0f, x, 0.0f));				//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(1.0f, 1.0f, 0.0f); 
@@ -140,7 +144,7 @@ void drawScene(GLFWwindow* window) {
 
 	M = mat4(1.0f);
 	 
-	M = translate(M, vec3(3.0f, 0.5f, 0.0f));							//Pozycja pocz¹tkowa
+	M = translate(M, vec3(3.0f, 2.0f, 2.0f));							//Pozycja pocz¹tkowa
 	M = translate(M, vec3(0.0f, y, z));									//Ruch korbowodu
 	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
 	M = rotate(M, rodAngle, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
@@ -186,8 +190,8 @@ int main(void)
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 
 	//Orientacyjne wartoœci - do zmierzenia
-	r = 20.0f;
-	l = 60.0f;
+	r = 25.0f;
+	l = 80.0f;
 
 	idle = false;
 	rotateAngle = 0;
