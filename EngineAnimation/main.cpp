@@ -21,6 +21,10 @@ float cameraRotateVerticalAngle;
 float cameraRotateHorizontalAngle;
 float cameraDistance;
 
+vec3 pistonColor = vec3(0.827f, 0.827f, 0.827f);
+vec3 conrodColor = vec3(0.502f, 0.502f, 0.502f);
+vec3 shaftColor = vec3(0.753f, 0.753f, 0.753f);
+
 float rotateAngle;							//K¹t obrotu wa³u
 float r;									//Promieñ wa³u (pó³ jednego suwu)
 float l;									//D³ugoœæ korbowodu
@@ -150,7 +154,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(92.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
 	M = translate(M, vec3(0.0f, xpos0, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 1.0f, 0.0f);
+	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid();
 
 	//T³ok 1.
@@ -158,7 +162,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(3.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
 	M = translate(M, vec3(0.0f, xpos1, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 1.0f, 0.0f); 
+	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid(); 
 
 	//T³ok 2.
@@ -166,7 +170,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(-88.0f, 5.0f, 2.0f));			//Pozycja pocz¹tkowa
 	M = translate(M, vec3(0.0f, xpos2, 0.0f));			//Ruch w górê i w dó³ zale¿ny od k¹ta obrotu wa³u
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 1.0f, 0.0f);
+	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid();
 
 
@@ -177,7 +181,7 @@ void drawScene(GLFWwindow* window) {
 	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
 	M = rotate(M, rodAngle0, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 1.0f);
+	glColor3d(conrodColor[0], conrodColor[1], conrodColor[2]);
 	Models::conrod.drawSolid();
 
 	//Korobowód 1.
@@ -187,7 +191,7 @@ void drawScene(GLFWwindow* window) {
 	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
 	M = rotate(M, rodAngle1, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 1.0f); 
+	glColor3d(conrodColor[0], conrodColor[1], conrodColor[2]);
 	Models::conrod.drawSolid(); 
 
 	//Korobowód 2.
@@ -197,14 +201,14 @@ void drawScene(GLFWwindow* window) {
 	M = rotate(M, 0.5f * PI, vec3(1.0f, 0.0f, 0.0f));					//Pozycja pocz¹tkowa
 	M = rotate(M, rodAngle2, vec3(1.0f, 0.0f, 0.0f));					//Rotacja korbowodu 
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 1.0f);
+	glColor3d(conrodColor[0], conrodColor[1], conrodColor[2]);
 	Models::conrod.drawSolid();
 
 	M = mat4(1.0f);
 	M = rotate(M, -(6.0f / 32.0f)*PI, vec3(1.0f, 0.0f, 0.0f));	//Ustawienie pozycji pocz¹tkowej wa³u w celu synchronizacji 
 	M = rotate(M, rotateAngle, vec3(1.0f, 0.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(1.0f, 0.0f, 1.0f); 
+	glColor3d(shaftColor[0], shaftColor[1], shaftColor[2]);
 	Models::crankshaft.drawSolid(); 
 
 	glfwSwapBuffers(window); //Swap the back and front buffers
@@ -238,7 +242,7 @@ int main(void)
 	initOpenGLProgram(window); //Operacje inicjuj¹ce
 
 	//Orientacyjne wartoœci - do zmierzenia
-	r = 25.0f;
+	r = 22.0f;
 	l = 80.0f;
 
 	idle = false;
