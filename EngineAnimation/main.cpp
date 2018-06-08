@@ -145,6 +145,34 @@ void initOpenGLProgram(GLFWwindow* window) {
 	cameraRotateVerticalAngle = 0;
 }
 
+void calculateKinematics() {
+	//Obliczenia kinematyczne
+	xpos0 = r * cos(rotateAngle - offset0) + sqrt(l*l - (r*r*sin(rotateAngle - offset0)*sin(rotateAngle - offset0)));
+	yoff0 = r * cos(rotateAngle - offset0);
+	zoff0 = r * sin(rotateAngle - offset0);
+	rodAngle0 = acos(zoff0 / l);
+	xpos1 = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
+	yoff1 = r * cos(rotateAngle);	//Wyliczanie pozycji korbowodu
+	zoff1 = r * sin(rotateAngle);	//Wyliczanie pozycji korbowodu
+	rodAngle1 = acos(zoff1 / l);	//Wyliczanie k¹ta odchylenia korbowodu
+	xpos2 = r * cos(rotateAngle - offset2) + sqrt(l*l - (r*r*sin(rotateAngle - offset2)*sin(rotateAngle - offset2)));
+	yoff2 = r * cos(rotateAngle - offset2);
+	zoff2 = r * sin(rotateAngle - offset2);
+	rodAngle2 = acos(zoff2 / l);
+	//Zawory
+	if (rotateAngle >= 0 && rotateAngle <= PI) {
+		xvalve1i = sin(rotateAngle);	//Obliczanie pozycji zaworu ss¹cego
+	}
+	else if (rotateAngle >= 2.0f * PI && rotateAngle <= 3.0f * PI) {
+		xvalve1e = sin(rotateAngle);	//Obliczanie pozycji zaworu wydechowego
+	}
+	else {
+		xvalve1i = 0;
+		xvalve1e = 0;
+	}
+	
+}
+
 //Procedura rysuj¹ca zawartoœæ sceny
 void drawScene(GLFWwindow* window) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Wyczyœæ buffer koloru i przygotuj do rysowania 
@@ -155,26 +183,8 @@ void drawScene(GLFWwindow* window) {
 	glLoadMatrixf(value_ptr(P)); //Load projection matrix
 	glMatrixMode(GL_MODELVIEW);  //Turn on modelview matrix editing mode
 
-
-
 	calculateStroke();
-
-	//Obliczenia kinematyczne
-	xpos0 = r * cos(rotateAngle - offset0) + sqrt(l*l - (r*r*sin(rotateAngle - offset0)*sin(rotateAngle - offset0)));
-	yoff0 = r * cos(rotateAngle - offset0);
-	zoff0 = r * sin(rotateAngle - offset0);
-	rodAngle0 = acos(zoff0 / l);
-	xpos1 = r * cos(rotateAngle) + sqrt(l*l - (r*r*sin(rotateAngle)*sin(rotateAngle)));	//Wyliczanie pozycji t³oka
-	yoff1 = r * cos(rotateAngle);	//Wyliczanie pozycji korbowodu
-	zoff1 = r * sin(rotateAngle);	//Wyliczanie pozycji korbowodu
-	rodAngle1 = acos(zoff1 / l);	//Wyliczanie k¹ta odchylenia korbowodu
-	xvalve1i = cos(rotateAngle);	//Obliczanie pozycji zaworu ss¹cego
-	xvalve1e = sin(rotateAngle);	//Obliczanie pozycji zaworu wydechowego
-	xpos2 = r * cos(rotateAngle - offset2) + sqrt(l*l - (r*r*sin(rotateAngle - offset2)*sin(rotateAngle - offset2)));
-	yoff2 = r * cos(rotateAngle - offset2);
-	zoff2 = r * sin(rotateAngle - offset2);
-	rodAngle2 = acos(zoff2 / l);
-
+	calculateKinematics();
 
 	//T³ok 0.
 	mat4 M = mat4(1.0f);
@@ -203,7 +213,7 @@ void drawScene(GLFWwindow* window) {
 	//Zawór ss¹cy 1.
 	M = mat4(1.0f);
 	M = translate(M, vec3(14.0f, 135.0f, 2.0f));
-	M = translate(M, vec3(0.0f, xvalve1i * 10.0f, 0.0f));
+	M = translate(M, vec3(0.0f, -xvalve1i * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 0.0f);
 	Models::valve.drawSolid();
@@ -211,7 +221,7 @@ void drawScene(GLFWwindow* window) {
 	//Zawór wyydechowy 1.
 	M = mat4(1.0f);
 	M = translate(M, vec3(-10.0f, 135.0f, 2.0f));
-	M = translate(M, vec3(0.0f, xvalve1e * 10.0f, 0.0f));
+	M = translate(M, vec3(0.0f, -xvalve1e * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 0.0f);
 	Models::valve.drawSolid();
