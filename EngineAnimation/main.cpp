@@ -32,6 +32,7 @@ float xpos0, xpos1, xpos2;					//Pozycja t³oka (wysokoœæ od œrodka wa³u)
 float yoff0, yoff1, yoff2;					//Offset panweki w y
 float zoff0, zoff1, zoff2;					//Offset panewki w z
 float rodAngle0, rodAngle1, rodAngle2;		//K¹t odchylenia korbowodu
+float xvalve0i, xvalve0e, xvalve1i, xvalve1e, xvalve2i, xvalve2e;			//Pozycja zaworów (ssanie, wydech)
 float offset0 = 17.0f / 32.0f * PI, offset2 = -15.0f / 32.0f * PI;
 bool idle, rev;								//Automatyczny obrót silnika
 float acc, throttle;
@@ -167,6 +168,8 @@ void drawScene(GLFWwindow* window) {
 	yoff1 = r * cos(rotateAngle);	//Wyliczanie pozycji korbowodu
 	zoff1 = r * sin(rotateAngle);	//Wyliczanie pozycji korbowodu
 	rodAngle1 = acos(zoff1 / l);	//Wyliczanie k¹ta odchylenia korbowodu
+	xvalve1i = cos(rotateAngle);	//Obliczanie pozycji zaworu ss¹cego
+	xvalve1e = sin(rotateAngle);	//Obliczanie pozycji zaworu wydechowego
 	xpos2 = r * cos(rotateAngle - offset2) + sqrt(l*l - (r*r*sin(rotateAngle - offset2)*sin(rotateAngle - offset2)));
 	yoff2 = r * cos(rotateAngle - offset2);
 	zoff2 = r * sin(rotateAngle - offset2);
@@ -197,13 +200,22 @@ void drawScene(GLFWwindow* window) {
 	glColor3d(pistonColor[0], pistonColor[1], pistonColor[2]);
 	Models::piston.drawSolid();
 
-	//Zawory TODO
+	//Zawór ss¹cy 1.
 	M = mat4(1.0f);
-	//M = scale(M, vec3(10.0f, 20.0f, 10.0f));
-	M = translate(M, vec3(0.0f, 140.0f, 0.0f));
+	M = translate(M, vec3(14.0f, 135.0f, 2.0f));
+	M = translate(M, vec3(0.0f, xvalve1i * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
 	glColor3d(0.0f, 1.0f, 0.0f);
-	//Models::valve.drawSolid();
+	Models::valve.drawSolid();
+
+	//Zawór wyydechowy 1.
+	M = mat4(1.0f);
+	M = translate(M, vec3(-10.0f, 135.0f, 2.0f));
+	M = translate(M, vec3(0.0f, xvalve1e * 10.0f, 0.0f));
+	glLoadMatrixf(value_ptr(V*M));
+	glColor3d(0.0f, 1.0f, 0.0f);
+	Models::valve.drawSolid();
+
 
 	//Korobowód 0.
 	M = mat4(1.0f);
