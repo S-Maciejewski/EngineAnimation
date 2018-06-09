@@ -12,7 +12,6 @@
 
 using namespace glm;
 
-
 float aspect = 1;
 float speed = PI/4;
 glm::vec3 cameraPosition;
@@ -24,6 +23,8 @@ float cameraDistance;
 vec3 pistonColor = vec3(0.827f, 0.827f, 0.827f);
 vec3 conrodColor = vec3(0.502f, 0.502f, 0.502f);
 vec3 shaftColor = vec3(0.753f, 0.753f, 0.753f);
+vec3 intakeColor = vec3(0.118f, 0.565f, 1.0f);
+vec3 exhaustColor = vec3(1.0f, 0.0f, 0.0f);
 
 float rotateAngle;							//K¹t obrotu wa³u
 float r;									//Promieñ wa³u (pó³ jednego suwu)
@@ -164,11 +165,10 @@ void calculateKinematics() {
 		xvalve0i = sin(rotateAngle - offset0);	//Obliczanie pozycji zaworu ss¹cego
 	}
 	else if (rotateAngle - offset0 >= 3.0f * PI && rotateAngle - offset0 <= 4.0f * PI) {
-		xvalve0e = sin(rotateAngle - offset0);	//Obliczanie pozycji zaworu wydechowego
+		xvalve0e = -sin(rotateAngle - offset0);	//Obliczanie pozycji zaworu wydechowego
 	}
-	else {
-		xvalve0i = 0;
-		xvalve0e = 0;
+	else if (rotateAngle <= offset0) {
+		xvalve0e = -sin(rotateAngle - offset0);
 	}
 
 	//Para 1.
@@ -178,23 +178,18 @@ void calculateKinematics() {
 	else if (rotateAngle >= 3.0f * PI && rotateAngle <= 4.0f * PI) {
 		xvalve1e = -sin(rotateAngle);	//Obliczanie pozycji zaworu wydechowego
 	}
-	else {
-		xvalve1i = 0;
-		xvalve1e = 0;
-	}
 
 	//Para 2.
 	if (rotateAngle - offset2 >= 0 && rotateAngle - offset2 <= PI) {
 		xvalve2i = sin(rotateAngle - offset2);	//Obliczanie pozycji zaworu ss¹cego
 	}
 	else if (rotateAngle - offset2 >= 3.0f * PI && rotateAngle - offset2 <= 4.0f * PI) {
-		xvalve2e = sin(rotateAngle - offset2);	//Obliczanie pozycji zaworu wydechowego
+		xvalve2e = -sin(rotateAngle - offset2);	//Obliczanie pozycji zaworu wydechowego
 	}
-	else {
-		xvalve2i = 0;
-		xvalve2e = 0;
+	else if (rotateAngle <= 4.0 * PI && rotateAngle - offset2 >= 4.0 * PI) {
+		xvalve2i = sin(rotateAngle - offset2);
 	}
-	
+
 }
 
 //Procedura rysuj¹ca zawartoœæ sceny
@@ -239,15 +234,15 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(103.0f, 135.0f, 2.0f));
 	M = translate(M, vec3(0.0f, -xvalve0i * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(intakeColor[0], intakeColor[1], intakeColor[2]);
 	Models::valve.drawSolid();
 
 	//Zawór wyydechowy 0.
 	M = mat4(1.0f);
 	M = translate(M, vec3(79.0f, 135.0f, 2.0f));
-	M = translate(M, vec3(0.0f, -xvalve0e * 10.0f, 0.0f));
+	M = translate(M, vec3(0.0f, (-xvalve0e +sin(PI / 32.0f)) * 10.0f, 0.0f));	//Dodatkowo poprawka na przesuniêcie suwu w fazie wzglêdem 1.
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(exhaustColor[0], exhaustColor[1], exhaustColor[2]);
 	Models::valve.drawSolid();
 
 	//Zawór ss¹cy 1.
@@ -255,7 +250,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(14.0f, 135.0f, 2.0f));
 	M = translate(M, vec3(0.0f, -xvalve1i * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(intakeColor[0], intakeColor[1], intakeColor[2]);
 	Models::valve.drawSolid();
 
 	//Zawór wyydechowy 1.
@@ -263,7 +258,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(-10.0f, 135.0f, 2.0f));
 	M = translate(M, vec3(0.0f, -xvalve1e * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(exhaustColor[0], exhaustColor[1], exhaustColor[2]);
 	Models::valve.drawSolid();
 
 	//Zawór ss¹cy 2.
@@ -271,7 +266,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(-77.0f, 135.0f, 2.0f));
 	M = translate(M, vec3(0.0f, -xvalve2i * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(intakeColor[0], intakeColor[1], intakeColor[2]);
 	Models::valve.drawSolid();
 
 	//Zawór wyydechowy 2.
@@ -279,7 +274,7 @@ void drawScene(GLFWwindow* window) {
 	M = translate(M, vec3(-101.0f, 135.0f, 2.0f));
 	M = translate(M, vec3(0.0f, -xvalve2e * 10.0f, 0.0f));
 	glLoadMatrixf(value_ptr(V*M));
-	glColor3d(0.0f, 1.0f, 0.0f);
+	glColor3d(exhaustColor[0], exhaustColor[1], exhaustColor[2]);
 	Models::valve.drawSolid();
 
 
