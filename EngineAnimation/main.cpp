@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <cmath>
+#include <ctime>
 #include "allmodels.h"
 #include "constants.h"
 
@@ -26,7 +27,7 @@ vec3 shaftColor = vec3(0.753f, 0.753f, 0.753f);
 vec3 intakeColor = vec3(0.118f, 0.565f, 1.0f);
 vec3 exhaustColor = vec3(1.0f, 0.0f, 0.0f);
 
-float rotateAngle;							//K¹t obrotu wa³u
+float rotateAngle, revCounter;				//K¹t obrotu wa³u
 float r;									//Promieñ wa³u (pó³ jednego suwu)
 float l;									//D³ugoœæ korbowodu
 float xpos0, xpos1, xpos2;					//Pozycja t³oka (wysokoœæ od œrodka wa³u)
@@ -45,10 +46,15 @@ void calculateStroke() {
 }
 
 void engineResponse() {
-	if (idle)
+	if (idle) {
 		rotateAngle += PI / 32.0f;
-	if (rev)
+		revCounter += PI / 32.0f;
+	}
+		
+	if (rev) {
 		rotateAngle += PI / 8.0f;
+		revCounter += PI / 8.0f;
+	}
 	if (idle) {
 		if (throttle > 0.2f) {
 			throttle -= 0.2f;
@@ -61,6 +67,7 @@ void engineResponse() {
 		else
 			throttle = 0;
 		rotateAngle += PI / 32.0f * acc;
+		revCounter += PI / 32.0f * acc;
 	}
 	
 }
@@ -112,13 +119,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
 		cameraDistance -= 10;
 
-	if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
+	if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 		rotateAngle += PI / 32.0f;
-	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
+		printf("%d/32 PI\n", int(rotateAngle / PI * 32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing
+	}
+	if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS)){
 		rotateAngle -= PI / 32.0f;
+	printf("%d/32 PI\n", int(rotateAngle / PI * 32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing
+	}
 
-	printf("%d/32 PI\n", int(rotateAngle/PI*32));	//¯eby ³atwiej by³o zrobiæ prawid³owy timing
-	
 	calculateStroke();
 
 	calculatePosition();
@@ -356,7 +365,10 @@ int main(void)
 	float height = 0;
 	int direction = 1;
 	glfwSetTime(0);
+	clock_t start;
 
+	revCounter = 0;
+	start = clock();
 	//G³ówna pêtla
 	while (!glfwWindowShouldClose(window))
 	{
@@ -366,6 +378,12 @@ int main(void)
 
 		drawScene(window);	//Wykonaj procedurê rysuj¹c¹
 		glfwPollEvents();	//Wykonaj procedury callback w zaleznoœci od zdarzeñ jakie zasz³y.
+
+		if ((clock() - start) / (float)CLOCKS_PER_SEC >= 1) {
+			printf("Aktualne obroty: %f RPM\n", revCounter*60.0f);
+			revCounter = 0;
+			start = clock();
+		}
 	}
 
 	glfwDestroyWindow(window); //Usuñ kontekst OpenGL i okno
