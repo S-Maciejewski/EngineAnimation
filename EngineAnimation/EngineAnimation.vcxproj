@@ -127,6 +127,7 @@
     <ClCompile Include="piston.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="valve.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allmodels.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="piston.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="valve.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="EngineAnimation.rc" />
