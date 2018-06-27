@@ -379,7 +379,8 @@ int main(void)
 		drawScene(window);	//Wykonaj procedurê rysuj¹c¹
 		glfwPollEvents();	//Wykonaj procedury callback w zaleznoœci od zdarzeñ jakie zasz³y.
 
-		if ((clock() - start) / (float)CLOCKS_PER_SEC >= 1) {
+		if ((clock() - start) / (float)CLOCKS_PER_SEC >= 1 && (idle || rev)) {
+			glColor3f(1.0f, 1.0f, 1.0f);
 			printf("Aktualne obroty: %f RPM\n", revCounter*60.0f);
 			revCounter = 0;
 			start = clock();
