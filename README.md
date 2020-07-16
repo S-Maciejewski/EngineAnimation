@@ -1,4 +1,4 @@
 # EngineAnimation
-Projekt na laboratoria z Computer Graphics and Visualization.
+Computer Graphics and Visualization laboratories project @ Computer Science, PUT Poznań
 
-Temat: Symulator pracy silnika czterosuwowego. Widoczne ruchome tłoki, zawory i wał korbowy.
+Topic: Four stroke engine simulation. Running engine with moving pistons, valves and crankshaft 
